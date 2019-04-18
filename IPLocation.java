@@ -8,7 +8,7 @@ public class IPLocation {
 		//pass empty string for localhost ip address
 		String host = "https://ipinfo.io";
 		if(ipaddress.length() != 0) host+="/"+ipaddress;
-		host +="/city?token="+PrivateData.TOKEN;
+		host +="/city?token="+PrivateData.IPINFO_TOKEN;
 		URL url = new URL(host);
 		return getCity(url);
 	}
