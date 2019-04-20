@@ -5,20 +5,28 @@ import com.google.gson.Gson;
 
 public class Weather {
 
-	String name;
-	Coord coord;
-	WeatherC []weather;
-	String base;
+	String name; //city name
+	Coord coord; //city coords
+	WeatherC []weather; //weather data
+//	String base;
 	TempInfo main;
 	Wind wind;
 	Cloud clouds;
+	String unit="metric"; //metric/imperial
 
 	private Weather() {;
 	}
 
-	public static Weather fromCity(String city) throws Exception{
+	public static Weather fromCity(String city, String unit) throws Exception{
 
-		URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q="+city+"&APPID="+PrivateData.OPENWEATHER_KEY);
+		URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=" + unit + "&APPID=" + PrivateData.OPENWEATHER_KEY);
+		Weather w = Weather.getWeather(url);
+		w.unit = unit;
+		return w;
+	}
+	
+	public static Weather fromCity(String city) throws Exception {
+		URL url = new URL("https://api.openweathermap.org/data/2.5/weather?q=" + city+ "&APPID=" + PrivateData.OPENWEATHER_KEY);
 		return Weather.getWeather(url);
 	}
 
@@ -46,6 +54,31 @@ public class Weather {
 
 	String getIconURL() {
 		return "http://openweathermap.org/img/w/"+weather[0].icon+".png";
+	}
+	
+	String getWeatherInfo() {
+	    return "<html>"+"Description: "+weather[0].description+"<br>"+
+	        "Temperature: "+main.temp+getUnit("temp")+"<br/>"+
+	        "Pressure: "+main.pressure+getUnit("pressure")+"<br/>"+
+	        "Humidity: "+main.humidity+getUnit("humidity")+"<br/>"+
+	        "Max temperature: "+main.temp_max+getUnit("temp")+"<br/>"+
+	        "Min temperature: "+main.temp_min+getUnit("temp")+"<br/>"+
+	        "Wind speed: "+wind.speed+getUnit("speed")
+	        +"</html>";
+	}
+	
+	String getUnit(String m) {
+    	if(m=="pressure") return "hPa";
+    	if(m=="humidity") return "%";
+	    if(unit == "metric") {
+    	    if(m == "temp") return "<sup>o</sup>C";
+    	    if(m == "speed") return "meter/sec";
+    	}
+    	else if(unit == "imperial") {
+    	    if(m == "temp") return "<sup>o</sup>F";
+    	    if(m == "speed") return "miles/hour";
+    	}
+    	return "unit(s)";
 	}
 
 	public static void main(String args[]) throws Exception{
@@ -82,7 +115,7 @@ class TempInfo {
 
 class Wind {
 	float speed;
-	int deg;
+	float deg;
 }
 
 class Cloud {
